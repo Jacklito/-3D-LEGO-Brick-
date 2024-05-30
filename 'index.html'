@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D LEGO Brick</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene, camera, and renderer setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // LEGO brick dimensions
+        const brickWidth = 2;
+        const brickHeight = 1;
+        const brickDepth = 1;
+
+        // Create the main body of the brick
+        const geometry = new THREE.BoxGeometry(brickWidth, brickHeight, brickDepth);
+        const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+        const brick = new THREE.Mesh(geometry, material);
+        scene.add(brick);
+
+        // Create the studs on top of the brick
+        const studRadius = 0.2;
+        const studHeight = 0.1;
+        const studGeometry = new THREE.CylinderGeometry(studRadius, studRadius, studHeight, 32);
+        const studMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
+        const studs = [];
+        for (let i = -0.5; i <= 0.5; i++) {
+            for (let j = -0.5; j <= 0.5; j++) {
+                const stud = new THREE.Mesh(studGeometry, studMaterial);
+                stud.position.set(i * brickWidth, brickHeight / 2, j * brickDepth);
+                stud.position.y += studHeight / 2;
+                studs.push(stud);
+                scene.add(stud);
+            }
+        }
+
+        // Camera positioning
+        camera.position.z = 5;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate the brick for a better view
+            brick.rotation.x += 0.01;
+            brick.rotation.y += 0.01;
+
+            studs.forEach(stud => {
+                stud.rotation.x += 0.01;
+                stud.rotation.y += 0.01;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle window resizing
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
